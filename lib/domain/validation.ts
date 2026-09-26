@@ -1,0 +1,4 @@
+import {z} from 'zod';
+import {models,plans,providers} from '../config';
+export const setupSchema=z.object({id:z.string(),name:z.string(),providerId:z.string(),modelId:z.string(),planId:z.string(),allowance:z.number().finite().positive().max(1e12).nullable(),allowanceUnit:z.enum(['tokens','credits']),pointsPerCredit:z.number().finite().positive().max(1e9).nullable()}).refine(s=>providers.some(p=>p.id===s.providerId)&&models.some(m=>m.id===s.modelId&&m.providerId===s.providerId&&m.active)&&plans.some(p=>p.id===s.planId&&p.providerId===s.providerId),'AI 설정을 다시 선택해주세요.').refine(s=>s.allowance===null||s.allowanceUnit!=='credits'||s.pointsPerCredit!==null,'크레딧 환산 기준을 입력해주세요.');
+export const promptSchema=z.string().trim().min(1,'프롬프트를 입력해주세요.').max(50000,'50,000자 이하로 입력해주세요.');

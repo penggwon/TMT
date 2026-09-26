@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import {defaultSetup,migrateSetup,models} from '../lib/config';
+import {usageEstimator} from '../lib/engine/usageEstimator';
+import {tokenEstimator} from '../lib/engine/tokenEstimator';
+import {promptOptimizer} from '../lib/services/promptOptimizer';
+const simple=usageEstimator('Write a friendly email in up to 100 words.',defaultSetup);
+assert.equal(simple.planPercentageMin,null);
+assert(simple.estimatedApiCost!==null&&simple.estimatedApiCost>0);
+assert(simple.estimatedMinUsage<=simple.estimatedLikelyUsage&&simple.estimatedLikelyUsage<=simple.estimatedMaxUsage);
+assert.equal(tokenEstimator(''),0);assert(tokenEstimator('안녕하세요')>tokenEstimator('hello'));
+const broad=usageEstimator('Analyze my entire website, improve every file, implement and test all code.',defaultSetup);
+assert(broad.estimatedLikelyUsage>simple.estimatedLikelyUsage);
+assert(broad.reasons.length<=3);
+const budget=usageEstimator(simple.prompt,{...defaultSetup,allowance:10000});
+const tokens=budget.estimatedInputTokens+budget.estimatedContextTokens+budget.estimatedOutputTokens;
+assert.equal(budget.planPercentageMin,tokens*.7/10000*100);
+const credits=usageEstimator(simple.prompt,{...defaultSetup,allowance:100,allowanceUnit:'credits',pointsPerCredit:10});
+assert.equal(credits.planPercentageMin,credits.estimatedLikelyUsage/10*.7/100*100);
+for(const allowance of [0,-1,Infinity,NaN])assert.throws(()=>usageEstimator(simple.prompt,{...defaultSetup,allowance}));
+assert.throws(()=>usageEstimator('',defaultSetup));assert.throws(()=>usageEstimator('x'.repeat(50001),defaultSetup));
+assert.throws(()=>usageEstimator(simple.prompt,{...defaultSetup,providerId:'anthropic'}));
+assert.throws(()=>usageEstimator(simple.prompt,{...defaultSetup,allowance:100,allowanceUnit:'credits'}));
+const opt=promptOptimizer(broad.prompt);assert(opt.optimizedPrompt.includes(broad.prompt));assert(!opt.optimizedPrompt.includes('/src/'));
+assert(usageEstimator(opt.optimizedPrompt,defaultSetup).estimatedLikelyUsage<broad.estimatedLikelyUsage);
+const korean=usageEstimator('전체 프로젝트를 분석하고 모든 코드를 수정하고 테스트해줘',defaultSetup);assert(korean.signals.repository);assert(korean.signals.tools.length>0);
+console.log('Engine integrity checks passed: ranges, units, unknown quota, validation, Korean/English, staged optimization.');
+
+assert.equal(migrateSetup({...defaultSetup,modelId:'openai-balanced'}).modelId,'gpt-6-astra');
+assert(models.every(m=>m.dataStatus==='verified'&&m.source&&m.lastVerifiedAt));
+
+assert.equal(promptOptimizer(simple.prompt).optimizedPrompt,simple.prompt);
