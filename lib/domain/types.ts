@@ -2,7 +2,7 @@ export interface Provider { id:string; name:string; description:string; mark:str
 export interface Model { id:string; providerId:string; name:string; displayName:string; description:string; inputTokenRate:number|null; outputTokenRate:number|null; cachedTokenRate:number|null; reasoningMultiplier:number; contextWindow:number|null; active:boolean; updatedAt:string; dataStatus:"sample"|"verified"; source?:string; lastVerifiedAt?:string; estimationStatus?:"heuristic" }
 export interface Plan { id:string; providerId:string; name:string; monthlyPrice:number|null; usageType:"dynamic"|"custom"; estimatedAllowance:number|null; allowanceUnit:string; resetPeriod:string; notes:string; source:string|null; lastVerifiedAt:string|null }
 export interface User { id:string; email:string; defaultSetupId:string|null }
-export interface UserSetup { id:string; name:string; providerId:string; modelId:string; planId:string; allowance:number|null; allowanceUnit:"tokens"|"credits"; pointsPerCredit:number|null }
+export interface UserSetup { id:string; name:string; providerId:string; modelId:string; planId:string; allowance:number|null; allowanceUnit:"tokens"|"credits"; pointsPerCredit:number|null; contextText?:string; outputTokens?:number|null }
 export interface UsageFeedback { id:string; analysisId:string; actualUsage:number; unit:string; createdAt:string }
 export interface PromptOptimization { originalPrompt:string; optimizedPrompt:string; method:"local-rules"; changes:string[] }
 export interface Signal { scope:number; tasks:number; code:boolean; repository:boolean; bounded:boolean; staged:boolean; level:"Low"|"Moderate"|"High"|"Very high"; tools:{name:string; likelihood:string}[] }

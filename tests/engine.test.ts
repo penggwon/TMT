@@ -29,3 +29,22 @@ assert.equal(migrateSetup({...defaultSetup,modelId:'openai-balanced'}).modelId,'
 assert(models.every(m=>m.dataStatus==='verified'&&m.source&&m.lastVerifiedAt));
 
 assert.equal(promptOptimizer(simple.prompt).optimizedPrompt,simple.prompt);
+
+// Published o200k examples / regressions: real token boundaries, not char ratios.
+assert.equal(tokenEstimator('Hello world'),2);
+assert.equal(tokenEstimator('antidisestablishmentarianism'),6);
+assert.equal(tokenEstimator('お誕生日おめでとう'),8);
+assert(tokenEstimator('👨‍👩‍👧‍👦')>1);
+assert.doesNotThrow(()=>tokenEstimator('<|endoftext|>'));
+assert.equal(usageEstimator('Hello world  ',defaultSetup).estimatedInputTokens,tokenEstimator('Hello world  '));
+assert.equal(simple.estimatedContextTokens,0);
+const specified=usageEstimator(broad.prompt,{...defaultSetup,contextText:'Hello world',outputTokens:500});
+assert.equal(specified.estimatedContextTokens,2);
+assert.equal(specified.estimatedOutputTokens,500);
+assert.equal(usageEstimator(broad.prompt,{...defaultSetup,contextText:''}).estimatedContextTokens,0);
+assert.throws(()=>usageEstimator(simple.prompt,{...defaultSetup,outputTokens:0}));
+assert.throws(()=>usageEstimator(simple.prompt,{...defaultSetup,outputTokens:1.5}));
+assert.throws(()=>usageEstimator(simple.prompt,{...defaultSetup,contextText:'x'.repeat(50001)}));
+assert.equal(usageEstimator('Write up to 150 words.',defaultSetup).estimatedOutputTokens,200);
+assert.equal(usageEstimator('답변을 최대 300토큰 이내로 작성해줘.',defaultSetup).estimatedOutputTokens,300);
+console.log('BPE and explicit context/output regression checks passed.');

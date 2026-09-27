@@ -25,3 +25,7 @@ Use installed Button, Select, RadioGroup, Progress, Tooltip, Dialog/Sheet when n
 
 ## 2026-09-27 revision
 Brand: 토큰 모아 태산. Hero: 토큰 모아 부자되자. Subtitle: 잘 쓴 프롬프트 하나 열 토큰 안부럽다. Remove upper AI Usage Calculator label. Mobile bottom navigation contains calculator/history only; desktop settings remain. Results heading: 토큰을 줄이는 방법. Add a plain-language 3-part token explanation (sent text, additional reading, answer) with actual result numbers, range and distinction from usage index. Model picker uses official names, source links and verified date; heuristic estimation is disclosed separately.
+
+
+## Current reference lock (2026-09-27)
+Primary composition: user-supplied Apple screenshot / MacBook Air page. Preserve central axis, strong centered heading, restrained right-aligned navigation, narrow reading width. Secondary supplied finance UI owns charcoal (#171717/#222222), light text, orange (#ff873e) active/action/data emphasis, rounded cards and vertical bars. Blank logo slot. Do not reintroduce sidebars or the settings tab. Input text remains left-aligned for editing; headings and aggregate results are centered. Real numeric bars only, no decorative fabricated data. Mobile keeps the two top tabs and stacks results.
